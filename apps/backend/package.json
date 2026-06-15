@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "@presentai/types": "workspace:*",
+    "bullmq": "^5.78.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.45.2",
     "express": "^4.19.2",
+    "ioredis": "^5.11.1",
+    "openai": "^6.42.0",
     "postgres": "^3.4.9",
     "zod": "^4.4.3"
   },
