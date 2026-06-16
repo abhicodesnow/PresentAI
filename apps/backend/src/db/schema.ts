@@ -20,3 +20,30 @@ export const slides = pgTable('slides', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
+
+export const generationJobs = pgTable('generation_jobs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  deckId: uuid('deck_id')
+    .notNull()
+    .references(() => decks.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('pending'),
+  prompt: text('prompt').notNull(),
+  options: jsonb('options').notNull().default({}),
+  error: text('error'),
+  startedAt: timestamp('started_at', { withTimezone: true }),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+export const imageJobs = pgTable('image_jobs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  slideId: uuid('slide_id')
+    .notNull()
+    .references(() => slides.id, { onDelete: 'cascade' }),
+  slotId: text('slot_id').notNull(),
+  prompt: text('prompt').notNull(),
+  status: text('status').notNull().default('pending'),
+  resultUrl: text('result_url'),
+  error: text('error'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
