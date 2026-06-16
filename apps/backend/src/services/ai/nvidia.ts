@@ -54,6 +54,8 @@ async function callFullDeck(
   topic: string,
   slideCount: number,
   tone: string
+  
+
 ): Promise<FullDeckGeneration> {
   
   const response = await client.chat.completions.create({
@@ -63,13 +65,29 @@ async function callFullDeck(
     messages: [
       {
         role: 'system',
-        content: `Generate a complete presentation as JSON:
-        {"title":"string","slides":[{"layoutId":"id","brief":"purpose","slots":{"slotId":"content"}}]}
-        Rules:
-        - Exactly ${slideCount} slides, cohesive narrative
-        - layoutId must be one of: "title-hero", "bullet-list", "two-column", "quote-full", "closing-cta"
-        - Tone: ${tone}
-        - Fill all required slots with highly relevant text.`
+        content: `You are an expert presentation generator. You MUST output ONLY valid JSON. 
+        Do not include any conversational text or markdown formatting outside the JSON object.
+        
+        You must strictly follow this exact schema structure:
+        {
+          "title": "Main Presentation Title",
+          "slides": [
+            {
+              "layoutId": "title-hero",
+              "brief": "Purpose of the slide",
+              "slots": {
+                "title": "Slide Headline",
+                "body": "Detailed slide content goes here"
+              }
+            }
+          ]
+        }
+
+        Strict Rules:
+        1. Generate exactly ${slideCount} slides.
+        2. "layoutId" MUST be exactly one of: "title-hero", "bullet-list", "two-column", "quote-full", "closing-cta".
+        3. Tone: ${tone}.
+        4. Fill all "slots" with highly relevant, educational text based on the user's topic.`
       },
       {
         role: 'user',
