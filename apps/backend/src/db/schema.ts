@@ -2,6 +2,7 @@ import { pgTable, uuid, text, timestamp, jsonb, integer } from 'drizzle-orm/pg-c
 
 export const decks = pgTable('decks', {
   id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id'),
   title: text('title').notNull(),
   theme: text('theme').notNull().default('default'),
   status: text('status').notNull().default('ready'),

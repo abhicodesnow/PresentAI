@@ -8,9 +8,12 @@ export const api = axios.create({
 });
 
 export const aiService = {
-  generateDeck: async (topic: string, slideCount: number = 5, tone: string = 'professional') => {
-    const { data } = await api.post('/generate', { topic, slideCount, tone });
-    return data; 
+  generateDeck: async (topic: string, slideCount: number = 5, tone: string = 'professional', token?: string | null) => {
+    
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    
+    const { data } = await api.post('/generate', { topic, slideCount, tone }, { headers });
+    return data;
   },
   checkStatus: async (jobId: string) => {
     const { data } = await api.get(`/generate/${jobId}/status`);

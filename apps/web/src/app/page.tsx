@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { aiService } from '../lib/api-client';
+import { useAuth } from '@clerk/nextjs';
 
 export default function Home() {
   const router = useRouter();
   const [topic, setTopic] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const { getToken } = useAuth();
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +20,8 @@ export default function Home() {
     
     try {
       // 1. Kick off the AI pipeline on your backend
-      const response = await aiService.generateDeck(topic, 5, 'professional');
+      const token = await getToken();
+      const response = await aiService.generateDeck(topic, 5, 'professional', token);
       
       // 2. Redirect the user to the live preview/loading screen
       router.push(`/generate/${response.jobId}?deck=${response.deckId}`);
