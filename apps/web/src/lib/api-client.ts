@@ -18,7 +18,26 @@ export const aiService = {
   checkStatus: async (jobId: string) => {
     const { data } = await api.get(`/generate/${jobId}/status`);
     return data;
-  }
+  },
+  getHistory: async (token: string | null) => {
+    try {
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const { data } = await api.get('/decks', { headers });
+      return data.decks || [];
+    } catch (error) {
+      console.error('Error fetching history:', error);
+      return [];
+    }
+  },
+  getDeck: async (id: string) => {
+    try {
+      const { data } = await api.get(`/decks/${id}`);
+      return data;
+    } catch (error) {
+      console.error('Error fetching deck:', error);
+      throw error;
+    }
+  },
 };
 
 export const deckService = {

@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { deckService } from '@/lib/api-client';
-import { Loader2 } from 'lucide-react';
-
+import { Loader2, ArrowLeft } from 'lucide-react';
 
 const safeRender = (data: any, fallback: string): string => {
   if (!data) return fallback;
@@ -12,7 +12,6 @@ const safeRender = (data: any, fallback: string): string => {
   
   try {
     if (Array.isArray(data)) {
-
       return data.map(item => {
         if (typeof item === 'string') return item;
         if (typeof item === 'object' && item !== null) {
@@ -59,7 +58,7 @@ export default function PresentationView() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-foreground/40">
+      <div className="min-h-full flex items-center justify-center text-foreground/40 py-32">
         <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
@@ -67,15 +66,33 @@ export default function PresentationView() {
 
   if (error || !deck) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        {error || 'Presentation not found'}
+      <div className="min-h-full flex flex-col gap-4 items-center justify-center text-red-500 py-32">
+        <p>{error || 'Presentation not found'}</p>
+        <Link 
+          href="/" 
+          className="flex items-center gap-2 px-4 py-2 mt-4 text-sm font-medium text-foreground bg-foreground/10 rounded-full hover:bg-foreground/20 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Return Home
+        </Link>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground p-8 md:p-16">
-      <div className="max-w-4xl mx-auto space-y-12">
+    // Re-added 'relative' here so the absolute back button pins to the top-left of this container
+    <main className="relative min-h-full bg-background text-foreground p-8 md:p-16">
+      
+      {/* --- RESTORED FLOATING BACK BUTTON --- */}
+      <Link 
+        href="/" 
+        className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/60 bg-foreground/5 rounded-full hover:text-foreground hover:bg-foreground/10 transition-colors z-50"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back
+      </Link>
+
+      <div className="max-w-4xl mx-auto space-y-12 mt-12 md:mt-8">
         
         <header className="border-b-2 border-foreground/10 pb-8 mb-12">
           <h1 className="text-4xl md:text-6xl font-semibold tracking-tighter mb-4">
@@ -99,7 +116,6 @@ export default function PresentationView() {
                   Slide {index + 1}
                 </div>
                 
-                {/* Wrapped every text injection in our safeRender function */}
                 <h2 className="text-3xl font-medium tracking-tight mb-6">
                   {safeRender(slideContent?.title, 'No Title Generated')}
                 </h2>

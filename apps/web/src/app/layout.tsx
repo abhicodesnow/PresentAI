@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from '@clerk/nextjs';
 import "./globals.css";
 
+// 1. Import the new SidebarLayout shell
+import SidebarLayout from "@/components/SidebarLayout"; 
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -26,8 +29,15 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
-          {children}
+        {/* Added the font variables here so your custom fonts work perfectly! */}
+        <body 
+          className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col antialiased`} 
+          suppressHydrationWarning
+        >
+          {/* 2. Wrap the entire app in the SidebarLayout */}
+          <SidebarLayout>
+            {children}
+          </SidebarLayout>
         </body>
       </html>
     </ClerkProvider>
