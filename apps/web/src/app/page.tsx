@@ -1,53 +1,91 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, User } from 'lucide-react';
 import { aiService } from '../lib/api-client';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth, useClerk, UserButton } from '@clerk/nextjs';
 
 export default function Home() {
   const router = useRouter();
   const [topic, setTopic] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const { getToken } = useAuth();
+  const [isGuest, setIsGuest] = useState(false);
+  
+  const { getToken, isSignedIn } = useAuth();
+  const clerk = useClerk();
+
+  // Check if they previously chose to continue as a guest
+  useEffect(() => {
+    if (localStorage.getItem('presentai_guest') === 'true') {
+      setIsGuest(true);
+    }
+  }, []);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!topic.trim() || isGenerating) return;
 
+    // INTERCEPT GUESTS HERE: Block them only if they aren't signed in AND aren't a guest
+    if (!isSignedIn && !isGuest) {
+      clerk.redirectToSignIn();
+      return; 
+    }
+
     setIsGenerating(true);
     
     try {
-      // 1. Kick off the AI pipeline on your backend
+      // If guest, getToken returns null. Our API client already handles null tokens safely!
       const token = await getToken();
       const response = await aiService.generateDeck(topic, 5, 'professional', token);
       
-      // 2. Redirect the user to the live preview/loading screen
       router.push(`/generate/${response.jobId}?deck=${response.deckId}`);
-    } catch (error) {
-      console.error('Failed to start generation:', error);
+    } catch (error: any) {
+      console.error('Backend Error Response:', error.response?.data || error);
       setIsGenerating(false);
       alert('Failed to connect to the AI. Please ensure your backend is running!');
     }
   };
 
+  const handleExitGuestMode = () => {
+    localStorage.removeItem('presentai_guest');
+    setIsGuest(false);
+    clerk.redirectToSignIn();
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 sm:p-12 md:p-24 selection:bg-foreground selection:text-background">
       
-      {/* Absolute minimal header */}
-      <div className="absolute top-8 left-8 font-medium tracking-tight text-sm text-foreground/50">
-        PresentAI
+      {/* Absolute minimal header with Dynamic Profile */}
+      <div className="absolute top-8 left-8 flex items-center gap-6">
+        <div className="font-medium tracking-tight text-sm text-foreground/50">
+          PresentAI
+        </div>
+        
+        {/* Dynamic Auth Header */}
+        {isSignedIn ? (
+          <UserButton />
+        ) : isGuest ? (
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-7 h-7 rounded-full bg-foreground/5 border border-foreground/10 text-foreground/50">
+              <User className="w-4 h-4" />
+            </div>
+            <button 
+              onClick={handleExitGuestMode}
+              className="text-xs font-medium text-foreground/40 hover:text-foreground transition-colors"
+            >
+              Log in to save decks
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <div className="w-full max-w-3xl space-y-12">
-        {/* Massive, opinionated typography */}
         <h1 className="text-5xl sm:text-6xl md:text-8xl font-semibold tracking-tighter leading-[0.9] text-balance">
           Ideas that <br />
           <span className="text-foreground/40">speak for themselves.</span>
         </h1>
 
-        {/* The single point of interaction */}
         <form onSubmit={handleGenerate} className="relative group">
           <input
             type="text"
