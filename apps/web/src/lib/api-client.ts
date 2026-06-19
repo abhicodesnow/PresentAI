@@ -38,6 +38,16 @@ export const aiService = {
       throw error;
     }
   },
+  deleteDeck: async (id: string, token: string | null) => {
+    try {
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      await api.delete(`/decks/${id}`, { headers });
+      return true;
+    } catch (error) {
+      console.error('Error deleting deck:', error);
+      throw error;
+    }
+  },
 };
 
 export const deckService = {

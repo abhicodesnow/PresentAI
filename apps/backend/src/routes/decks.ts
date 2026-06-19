@@ -71,12 +71,11 @@ decksRouter.get('/:id', async (req, res) => {
       slides: deckSlides,
     });
   } catch (error) {
-    // Catch any database errors here
     console.error('Error fetching single deck:', error);
     res.status(500).json({ error: 'Internal server error while fetching deck' });
   }
 });
-// --- EXISTING ROUTE: Update deck ---
+
 decksRouter.patch('/:id', async (req, res) => {
   const { id } = req.params;
   
@@ -85,7 +84,7 @@ decksRouter.patch('/:id', async (req, res) => {
     .safeParse(req.body);
 
   if (!body.success) {
-    // If z.treeifyError isn't working, fallback to standard flatten()
+   
     res.status(400).json({ error: body.error.flatten() });
     return;
   }
@@ -106,4 +105,30 @@ decksRouter.patch('/:id', async (req, res) => {
   }
 
   res.json(updated);
+});
+
+decksRouter.delete('/:id', ClerkExpressWithAuth(), async (req: any, res: any) => {
+  const userId = req.auth?.userId;
+  const { id } = req.params;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const [deck] = await db.select().from(decks).where(eq(decks.id, id)).limit(1);
+    
+    if (!deck || deck.userId !== userId) {
+      return res.status(404).json({ error: 'Deck not found or unauthorized' });
+    }
+
+    await db.delete(slides).where(eq(slides.deckId, id));
+
+    await db.delete(decks).where(eq(decks.id, id));
+
+    res.json({ success: true, message: 'Deck deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting deck:', error);
+    res.status(500).json({ error: 'Internal server error while deleting deck' });
+  }
 });
