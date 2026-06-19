@@ -3,12 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-// Added Check icon for the copy button feedback
-import { Menu, X, Clock, FileText, User, MoreVertical, Share2, Trash, ExternalLink, Check, Copy } from 'lucide-react';
+import { Menu, X, Clock, FileText, User, MoreVertical, Share2, Trash, ExternalLink, Check, Copy, Maximize, Sparkles } from 'lucide-react';
 import { useAuth, useClerk, UserButton } from '@clerk/nextjs';
 import { aiService } from '../lib/api-client';
 
-// Import the share buttons and icons!
 import { 
   TwitterShareButton, XIcon,
   LinkedinShareButton, LinkedinIcon,
@@ -27,7 +25,6 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const sidebarListRef = useRef<HTMLDivElement>(null);
   
-  // --- NEW MODAL STATE ---
   const [shareModalDeck, setShareModalDeck] = useState<{id: string, title: string} | null>(null);
   const [isCopied, setIsCopied] = useState(false);
 
@@ -70,22 +67,19 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     clerk.redirectToSignIn();
   };
 
-  // --- UPDATED HANDLE SHARE ---
   const handleShare = (id: string, title: string, e: React.MouseEvent) => {
     e.preventDefault(); 
     e.stopPropagation();
-    // Just open the modal!
     setShareModalDeck({ id, title });
     setOpenMenuId(null);
   };
 
-  // --- NEW COPY LINK FUNCTION ---
   const copyToClipboard = async () => {
     if (!shareModalDeck) return;
     const url = `${window.location.origin}/deck/${shareModalDeck.id}`;
     await navigator.clipboard.writeText(url);
     setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000); // Reset icon after 2 seconds
+    setTimeout(() => setIsCopied(false), 2000);
   };
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
@@ -117,11 +111,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     setOpenMenuId(null);
   };
 
-  if (pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up')) {
+  if (pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up') || pathname.startsWith('/preview')) {
     return <>{children}</>;
   }
 
-  // Generate the full URL for the share buttons
   const shareUrl = shareModalDeck ? `${typeof window !== 'undefined' ? window.location.origin : ''}/deck/${shareModalDeck.id}` : '';
 
   return (
@@ -163,13 +156,22 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 </button>
 
                 {openMenuId === item.id && (
-                  <div className="absolute right-8 top-8 w-48 bg-background border border-foreground/10 rounded-xl shadow-2xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="absolute right-8 top-8 w-52 bg-background border border-foreground/10 rounded-xl shadow-2xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                     <Link 
-                      href={`/deck/${item.id}`}
+                      href={`/preview/${item.id}`}
                       onClick={() => setOpenMenuId(null)}
                       className="w-full text-left px-4 py-2.5 text-sm text-foreground/80 hover:bg-foreground/5 hover:text-foreground flex items-center gap-3 transition-colors"
                     >
                       <ExternalLink className="w-4 h-4" /> Open Preview
+                    </Link>
+
+                    {/* NEW PRESENT FULL SCREEN ROUTE */}
+                    <Link 
+                      href={`/preview/${item.id}?fullscreen=true`}
+                      onClick={() => setOpenMenuId(null)}
+                      className="w-full text-left px-4 py-2.5 text-sm text-foreground/80 hover:bg-foreground/5 hover:text-foreground flex items-center gap-3 transition-colors"
+                    >
+                      <Maximize className="w-4 h-4" /> Present Full Screen
                     </Link>
                     
                     <button 
@@ -204,9 +206,14 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 <Menu className="w-5 h-5 text-foreground/80" />
               </button>
             )}
-            <Link href="/" className="font-medium tracking-tight text-sm text-foreground/50 hidden sm:block hover:text-foreground transition-colors">
-              PresentAI
-            </Link>
+            <Link href="/" className="flex items-center gap-2 group hidden sm:flex">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-foreground text-background group-hover:scale-105 transition-transform shadow-md">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <span className="font-semibold tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
+                PresentAI
+              </span>
+</Link>
           </div>
           
           <div className="pointer-events-auto">
@@ -234,71 +241,53 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         </main>
       </div>
 
-      {/* MOBILE SIDEBAR OVERLAY */}
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-background/50 backdrop-blur-sm z-30 transition-opacity md:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      {/* --- THE NEW SHARE MODAL --- */}
+      {/* SHARE MODAL */}
       {shareModalDeck && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-background border border-foreground/10 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            
             <div className="flex items-center justify-between p-6 border-b border-foreground/5">
               <div>
                 <h3 className="font-semibold text-lg tracking-tight">Share Presentation</h3>
                 <p className="text-sm text-foreground/50 truncate max-w-[250px]">{shareModalDeck.title}</p>
               </div>
-              <button 
-                onClick={() => setShareModalDeck(null)} 
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-foreground/5 text-foreground/50 hover:text-foreground transition-colors"
-              >
+              <button onClick={() => setShareModalDeck(null)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-foreground/5 text-foreground/50 hover:text-foreground transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
-
             <div className="p-8 space-y-8">
-              
-              {/* Social Icons Grid */}
               <div className="flex justify-center gap-6">
                 <TwitterShareButton url={shareUrl} title={shareModalDeck.title} className="hover:scale-110 transition-transform">
                   <XIcon size={48} round />
                 </TwitterShareButton>
-
                 <LinkedinShareButton url={shareUrl} title={shareModalDeck.title} className="hover:scale-110 transition-transform">
                   <LinkedinIcon size={48} round />
                 </LinkedinShareButton>
-
                 <WhatsappShareButton url={shareUrl} title={shareModalDeck.title} className="hover:scale-110 transition-transform">
                   <WhatsappIcon size={48} round />
                 </WhatsappShareButton>
-
                 <EmailShareButton url={shareUrl} subject="Check out this presentation" body={`I created this presentation using PresentAI. Check it out here: `} className="hover:scale-110 transition-transform">
                   <EmailIcon size={48} round />
                 </EmailShareButton>
               </div>
-
-              {/* Copy Link Input Area */}
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-foreground/50 uppercase tracking-wider">Or copy link</label>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-3 text-sm text-foreground/70 truncate selection:bg-foreground/20">
+                  <div className="flex-1 bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-3 text-sm text-foreground/70 truncate">
                     {shareUrl}
                   </div>
-                  <button 
-                    onClick={copyToClipboard}
-                    className="flex items-center justify-center w-12 h-12 bg-foreground text-background rounded-xl hover:scale-105 active:scale-95 transition-all"
-                  >
+                  <button onClick={copyToClipboard} className="flex items-center justify-center w-12 h-12 bg-foreground text-background rounded-xl hover:scale-105 active:scale-95 transition-all">
                     {isCopied ? <Check className="w-5 h-5 text-green-400" /> : <Copy className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
-              
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }

@@ -51,33 +51,47 @@ export default function Home() {
   };
 
   return (
-    // min-h-full ensures it perfectly fills the space left by the global header
-    <div className="flex flex-col items-center justify-center min-h-full p-6 sm:p-12 md:p-24">
-      <div className="w-full max-w-3xl space-y-12 pb-20">
+    // We added the custom background image here, plus a dark overlay so the text stays readable!
+    <div className="relative flex flex-col items-center justify-center min-h-full p-6 sm:p-12 md:p-24 overflow-hidden bg-[url('/bg.png')] bg-cover bg-center bg-no-repeat">
+      
+      {/* Subtle dark overlay to blend the image into the app */}
+      <div className="absolute inset-0 bg-background/70 z-0" />
+
+      <div className="relative z-10 w-full max-w-3xl space-y-12 pb-20">
+        
         <h1 className="text-5xl sm:text-6xl md:text-8xl font-semibold tracking-tighter leading-[0.9] text-balance">
           Ideas that <br />
           <span className="text-foreground/40">speak for themselves.</span>
         </h1>
 
-        <form onSubmit={handleGenerate} className="relative group">
-          <input
-            type="text"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            disabled={isGenerating}
-            placeholder="What are we presenting today?"
-            className="w-full bg-transparent border-b-2 border-foreground/10 pb-4 text-xl sm:text-2xl outline-none placeholder:text-foreground/20 transition-all focus:border-foreground disabled:opacity-50"
-            autoFocus
-          />
-          
-          <button
-            type="submit"
-            disabled={!topic.trim() || isGenerating}
-            className="absolute right-0 bottom-4 flex items-center justify-center w-10 h-10 rounded-full bg-foreground text-background opacity-0 translate-y-2 group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all disabled:bg-foreground/20 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
-          >
-            {isGenerating ? <Sparkles className="w-5 h-5 animate-pulse" /> : <ArrowRight className="w-5 h-5" />}
-          </button>
-        </form>
+        <div className="space-y-4">
+          <form onSubmit={handleGenerate} className="relative group">
+            <input
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              disabled={isGenerating}
+              placeholder="What are we presenting today?"
+              className="w-full bg-transparent border-b-2 border-foreground/10 pb-4 text-xl sm:text-2xl outline-none placeholder:text-foreground/20 transition-all focus:border-foreground disabled:opacity-50"
+              autoFocus
+            />
+            
+            <button
+              type="submit"
+              disabled={!topic.trim() || isGenerating}
+              className="absolute right-0 bottom-4 flex items-center justify-center w-10 h-10 rounded-full bg-foreground text-background opacity-0 translate-y-2 group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all disabled:bg-foreground/20 disabled:cursor-not-allowed hover:scale-105 active:scale-95 shadow-lg"
+            >
+              {isGenerating ? <Sparkles className="w-5 h-5 animate-pulse" /> : <ArrowRight className="w-5 h-5" />}
+            </button>
+          </form>
+
+          {/* Powered By Text */}
+          <div className="flex items-center gap-2 text-foreground/30 text-xs font-semibold tracking-widest uppercase pl-1">
+            <Sparkles className="w-3 h-3" />
+            Powered by Llama 3.1 & Next.js
+          </div>
+        </div>
+
       </div>
     </div>
   );
