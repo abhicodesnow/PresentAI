@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Menu, X, Clock, FileText, User, MoreVertical, Share2, Trash, ExternalLink, Check, Copy, Maximize, Sparkles } from 'lucide-react';
+import { Menu, X, Clock, FileText, User, MoreVertical, Share2, Trash, ExternalLink, Check, Copy, Maximize, Sparkles} from 'lucide-react';
 import { useAuth, useClerk, UserButton } from '@clerk/nextjs';
 import { aiService } from '../lib/api-client';
 
 import { 
-  TwitterShareButton, XIcon,
+  XShareButton, XIcon,
   LinkedinShareButton, LinkedinIcon,
   WhatsappShareButton, WhatsappIcon,
   EmailShareButton, EmailIcon
@@ -121,7 +121,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     <div className="flex h-screen bg-background overflow-hidden selection:bg-foreground selection:text-background">
       
       {/* SIDEBAR */}
-      <div className={`fixed inset-y-0 left-0 z-40 w-72 bg-background border-r border-foreground/10 transform transition-transform duration-300 ease-in-out flex flex-col ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-background border-r border-foreground/10 transform transition-transform duration-300 ease-in-out flex flex-col ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between p-6 border-b border-foreground/5 h-20">
           <span className="font-medium tracking-tight text-sm text-foreground/50">History</span>
           <button onClick={() => setIsSidebarOpen(false)} className="text-foreground/40 hover:text-foreground">
@@ -156,7 +156,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 </button>
 
                 {openMenuId === item.id && (
-                  <div className="absolute right-8 top-8 w-52 bg-background border border-foreground/10 rounded-xl shadow-2xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="absolute right-8 top-8 w-52 bg-background border border-foreground/10 rounded-xl shadow-2xl z-[60] py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                     <Link 
                       href={`/preview/${item.id}`}
                       onClick={() => setOpenMenuId(null)}
@@ -165,7 +165,6 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                       <ExternalLink className="w-4 h-4" /> Open Preview
                     </Link>
 
-                    {/* NEW PRESENT FULL SCREEN ROUTE */}
                     <Link 
                       href={`/preview/${item.id}?fullscreen=true`}
                       onClick={() => setOpenMenuId(null)}
@@ -199,7 +198,8 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
       {/* MAIN CONTENT */}
       <div className={`flex-1 flex flex-col h-screen transition-all duration-300 ${isSidebarOpen ? 'md:ml-72' : 'ml-0'}`}>
-        <header className="flex-shrink-0 h-20 px-6 sm:px-8 flex items-center justify-between z-30 pointer-events-none">
+        
+        <header className="relative flex-shrink-0 h-20 px-6 sm:px-8 flex items-center justify-between z-30 pointer-events-none bg-background">
           <div className="flex items-center gap-4 pointer-events-auto">
             {!isSidebarOpen && (
               <button onClick={() => setIsSidebarOpen(true)} className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-foreground/5 transition-colors">
@@ -213,7 +213,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               <span className="font-semibold tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
                 PresentAI
               </span>
-</Link>
+            </Link>
           </div>
           
           <div className="pointer-events-auto">
@@ -234,6 +234,29 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               </Link>
             )}
           </div>
+
+          {/* --- THE SWEEPING SCANNER BORDER --- */}
+          <div className="absolute bottom-0 left-0 right-0 h-[1px] z-50 bg-white/10 overflow-hidden">
+            {/* Injecting the keyframe directly into the document */}
+            <style>{`
+              @keyframes scan {
+                0%, 100% { transform: translateX(-100%); }
+                50% { transform: translateX(100%); }
+              }
+              .animate-scan {
+                animation: scan 25s ease-in-out infinite;
+              }
+            `}</style>
+            
+            {/* The sweeping container */}
+            <div className="absolute top-0 left-1/2 w-1/2 h-full -ml-[25%] flex items-center justify-center animate-scan">
+              {/* Soft outer aura */}
+              <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-white/50 to-transparent blur-[2px]" />
+              {/* Sharp bright core */}
+              <div className="absolute w-2/3 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+            </div>
+          </div>
+
         </header>
 
         <main className="flex-1 overflow-y-auto relative">
@@ -242,7 +265,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       </div>
 
       {isSidebarOpen && (
-        <div className="fixed inset-0 bg-background/50 backdrop-blur-sm z-30 transition-opacity md:hidden" onClick={() => setIsSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-background/50 backdrop-blur-sm z-40 transition-opacity md:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
 
       {/* SHARE MODAL */}
@@ -260,9 +283,9 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             </div>
             <div className="p-8 space-y-8">
               <div className="flex justify-center gap-6">
-                <TwitterShareButton url={shareUrl} title={shareModalDeck.title} className="hover:scale-110 transition-transform">
+                <XShareButton url={shareUrl} title={shareModalDeck.title} className="hover:scale-110 transition-transform">
                   <XIcon size={48} round />
-                </TwitterShareButton>
+                </XShareButton>
                 <LinkedinShareButton url={shareUrl} title={shareModalDeck.title} className="hover:scale-110 transition-transform">
                   <LinkedinIcon size={48} round />
                 </LinkedinShareButton>

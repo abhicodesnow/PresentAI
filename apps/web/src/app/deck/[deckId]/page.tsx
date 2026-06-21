@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { deckService } from '@/lib/api-client';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Eye, Play } from 'lucide-react';
 
 const safeRender = (data: any, fallback: string): string => {
   if (!data) return fallback;
@@ -80,10 +80,9 @@ export default function PresentationView() {
   }
 
   return (
-    // Re-added 'relative' here so the absolute back button pins to the top-left of this container
     <main className="relative min-h-full bg-background text-foreground p-8 md:p-16">
       
-      {/* --- RESTORED FLOATING BACK BUTTON --- */}
+      {/* FLOATING BACK BUTTON */}
       <Link 
         href="/" 
         className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/60 bg-foreground/5 rounded-full hover:text-foreground hover:bg-foreground/10 transition-colors z-50"
@@ -94,15 +93,41 @@ export default function PresentationView() {
 
       <div className="max-w-4xl mx-auto space-y-12 mt-12 md:mt-8">
         
-        <header className="border-b-2 border-foreground/10 pb-8 mb-12">
-          <h1 className="text-4xl md:text-6xl font-semibold tracking-tighter mb-4">
-            {safeRender(deck?.title, 'Untitled Presentation')}
-          </h1>
-          <p className="text-foreground/40 font-medium">
-            Generated AI Deck • {deck?.slides?.length || 0} Slides
-          </p>
+        {/* RESPONSIVE HEADER WITH QUICK ACTIONS */}
+        <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 pb-8 border-b-2 border-foreground/10 mb-12">
+          
+          {/* Title & Metadata */}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-4xl md:text-6xl font-semibold tracking-tighter mb-4 text-balance break-words leading-tight">
+              {safeRender(deck?.title, 'Untitled Presentation')}
+            </h1>
+            <p className="text-foreground/40 font-medium">
+              Generated AI Deck • {deck?.slides?.length || 0} Slides
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3 shrink-0 sm:pt-2">
+            <Link
+              href={`/preview/${deckId}`}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground/80 hover:text-foreground transition-colors font-medium text-sm border border-foreground/5"
+            >
+              <Eye className="w-4 h-4" />
+              Preview
+            </Link>
+            
+            <Link
+              href={`/preview/${deckId}?fullscreen=true`}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-foreground text-background hover:scale-105 active:scale-95 transition-all font-medium text-sm shadow-lg"
+            >
+              <Play className="w-4 h-4 fill-current" />
+              Present
+            </Link>
+          </div>
+          
         </header>
 
+        {/* SLIDES CONTENT */}
         <div className="space-y-16">
           {deck?.slides?.map((slide: any, index: number) => {
             const slideContent = slide?.slots || slide?.slotData;

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { aiService } from '../lib/api-client';
 import { useAuth, useClerk } from '@clerk/nextjs';
@@ -51,12 +52,23 @@ export default function Home() {
   };
 
   return (
-    // We added the custom background image here, plus a dark overlay so the text stays readable!
-    <div className="relative flex flex-col items-center justify-center min-h-full p-6 sm:p-12 md:p-24 overflow-hidden bg-[url('/bg.png')] bg-cover bg-center bg-no-repeat">
+    // Replaced min-h-full with min-h-[100dvh] for perfect mobile viewport sizing
+    // Removed the CSS background image classes from here
+    <div className="relative flex flex-col items-center justify-center min-h-[100dvh] w-full p-6 sm:p-12 md:p-24 overflow-hidden">
       
-      {/* Subtle dark overlay to blend the image into the app */}
-      <div className="absolute inset-0 bg-background/70 z-0" />
+      {/* 1. Next.js Optimized Responsive Background */}
+      <Image
+        src="/bg.png"
+        alt="Background"
+        fill
+        priority
+        className="object-cover object-center z-0"
+      />
+      
+      {/* 2. Subtle dark overlay to blend the image into the app */}
+      <div className="absolute inset-0 bg-background/80 z-[1]" />
 
+      {/* 3. The Main Content Container */}
       <div className="relative z-10 w-full max-w-3xl space-y-12 pb-20">
         
         <h1 className="text-5xl sm:text-6xl md:text-8xl font-semibold tracking-tighter leading-[0.9] text-balance">
