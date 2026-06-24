@@ -20,6 +20,7 @@
     "ioredis": "^5.11.1",
     "openai": "^6.42.0",
     "postgres": "^3.4.9",
+    "razorpay": "^2.9.6",
     "zod": "^4.4.3"
   },
   "devDependencies": {

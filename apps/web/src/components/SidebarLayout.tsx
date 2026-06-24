@@ -14,6 +14,9 @@ import {
   EmailShareButton, EmailIcon
 } from 'react-share';
 
+
+import UpgradeButton from './UpgradeButton';
+
 export default function SidebarLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -216,7 +219,13 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             </Link>
           </div>
           
-          <div className="pointer-events-auto">
+          {/* THE UPDATED HEADER RIGHT SIDE */}
+          <div className="flex items-center gap-4 pointer-events-auto">
+            
+            {/* 1. Our Premium Upgrade Button */}
+            <UpgradeButton />
+
+            {/* 2. Authentication states */}
             {isSignedIn ? (
               <UserButton />
             ) : isGuest ? (
