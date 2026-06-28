@@ -1,10 +1,10 @@
-# PresentAI 🚀
+# PresentAI 
 
 PresentAI is a premium full-stack AI-powered presentation platform built using a modern monorepo architecture. It allows users to dynamically generate gorgeous presentation decks using localized, high-performance open-source models through Ollama, complete with secure authentication and a seamless premium payment tier.
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 PresentAI is organized as a high-performance monorepo managed with **pnpm workspaces**:
 
@@ -22,7 +22,7 @@ PresentAI is organized as a high-performance monorepo managed with **pnpm worksp
 
 ---
 
-## 🚀 Features
+##  Features
 
 * **AI Deck Generation:** Generate customized interactive presentations instantly via structured prompts.
 * **Local, Private AI Execution:** Zero dependencies on third-party premium AI APIs—powered fully by a local deployment of Llama 3.1.
@@ -33,7 +33,7 @@ PresentAI is organized as a high-performance monorepo managed with **pnpm worksp
 
 ---
 
-## 🎛️ Local Machine Prerequisites
+##  Local Machine Prerequisites
 
 Before diving into setup, make sure you have the following installed locally:
 1. [Node.js (v18+) & pnpm](https://pnpm.io/installation)
@@ -41,7 +41,7 @@ Before diving into setup, make sure you have the following installed locally:
 
 ---
 
-## 🏗️ Step-by-Step Local Setup Guide
+##  Step-by-Step Local Setup Guide
 
 ### 1. Clone the Repository
 ```bash
@@ -67,7 +67,7 @@ PresentAI uses the highly performant **Llama 3.1** model. Make sure your local e
 
 ---
 
-## 🔑 Environment Configuration
+##  Environment Configuration
 
 You will need to configure environment variables across both workspace packages to enable functional authentication and payment structures.
 
@@ -103,7 +103,7 @@ pnpm dev
 
 ---
 
-## 💳 Razorpay E-Commerce Architecture 
+##  Razorpay E-Commerce Architecture 
 
 PresentAI uses an optimized one-time transaction system to completely bypass India's stringent subscription KYC requirements during initial development and deployment cycles:
 
