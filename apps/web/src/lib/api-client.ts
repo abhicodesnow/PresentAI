@@ -1,7 +1,20 @@
 import axios from 'axios';
 
+const defaultApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+
+const rootUrl = defaultApiUrl.replace(/\/api$/, '');
+
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
+  baseURL: defaultApiUrl,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+
+export const paymentApi = axios.create({
+  baseURL: rootUrl,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -9,9 +22,7 @@ export const api = axios.create({
 
 export const aiService = {
   generateDeck: async (topic: string, slideCount: number = 5, tone: string = 'professional', token?: string | null) => {
-    
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    
     const { data } = await api.post('/generate', { topic, slideCount, tone }, { headers });
     return data;
   },
@@ -53,6 +64,14 @@ export const aiService = {
 export const deckService = {
   getDeck: async (deckId: string) => {
     const { data } = await api.get(`/decks/${deckId}`);
+    return data;
+  }
+};
+
+export const paymentService = {
+  createOrder: async (amount: number, token?: string | null) => {
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const { data } = await paymentApi.post('/create-order', { amount }, { headers });
     return data;
   }
 };

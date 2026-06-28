@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth, useClerk } from '@clerk/nextjs';
 import { Sparkles, Loader2 } from 'lucide-react';
+import { paymentService } from '../lib/api-client'; 
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -17,15 +18,12 @@ const loadRazorpayScript = () => {
 export default function UpgradeButton() {
   const [isProcessing, setIsProcessing] = useState(false);
   
-  const { isSignedIn } = useAuth();
-  // We use the global clerk object here instead!
+  const { isSignedIn, getToken } = useAuth(); 
   const clerk = useClerk();
 
   const handleUpgrade = async () => {
-    // 1. STRICT AUTH GUARD: Prevent non-logged-in users from proceeding
     if (!isSignedIn) {
       alert('Please sign in to upgrade your account.');
-      // Instantly redirects them to your standard Clerk sign-in flow
       clerk.redirectToSignIn();
       return;
     }
@@ -40,13 +38,9 @@ export default function UpgradeButton() {
         return;
       }
 
-      // Change this URL to match your actual backend API endpoint
-      const response = await fetch('http://localhost:4000/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      
-      const order = await response.json();
+      const token = await getToken();
+
+      const order = await paymentService.createOrder(49900, token);
 
       if (!order || !order.id) {
         throw new Error('Failed to create order');
@@ -62,7 +56,6 @@ export default function UpgradeButton() {
         handler: async function (paymentResponse: any) {
           console.log("Payment Success!", paymentResponse);
           alert("Payment Successful! Welcome to Pro.");
-          // Verification logic goes here in the next step
         },
         theme: {
           color: "#050505", 
@@ -110,4 +103,4 @@ export default function UpgradeButton() {
       )}
     </button>
   );
-}
+} 
